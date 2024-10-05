@@ -28,6 +28,32 @@
                 "--staticfying_from", "10000"
 
             ]
+        },
+        {
+            "name": "train synthetic scene",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "./train.py",
+            "justMyCode": false,
+            "console": "integratedTerminal",
+            "args": [
+                "-s","/scratch-ssd/Datasets/deformgs/synthetic/scene_3",
+                "--port","6058",
+                "--expname","synthetic/scene_3",
+                "--configs","arguments/mdnerf-dataset/cube.py",
+                "--lambda_w","2000",
+                "--lambda_rigidity","0.0",
+                "--lambda_spring", "0.0",
+                "--lambda_momentum", "0.03",
+                "--lambda_velocity", "0.0",
+                "--view_skip", "1",
+                "--time_skip","1",
+                "--k_nearest", "20",
+                "--lambda_isometric", "0.3",
+                "--reg_iter", "11000",
+                "--staticfying_from", "10000"
+
+            ]
         }
     ]
 }
