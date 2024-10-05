@@ -70,6 +70,9 @@ class Scene:
             scene_info = sceneLoadTypeCallbacks["dynerf"](args.source_path, args.white_background, args.eval)
         elif os.path.exists(os.path.join(args.source_path,"dataset.json")):
             scene_info = sceneLoadTypeCallbacks["nerfies"](args.source_path, False, args.eval)
+        elif os.path.exists(os.path.join(args.source_path,"points3D_multipleview.ply")):
+            scene_info = sceneLoadTypeCallbacks["MultipleView"](args.source_path)
+            dataset_type="MultipleView"
         else:
             assert False, "Could not recognize scene type!"
         self.maxtime = scene_info.maxtime
