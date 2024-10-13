@@ -284,7 +284,7 @@ def generateCamerasFromTransforms(path, template_transformsfile, extension, maxt
             FovY = fovy 
             FovX = fovx
             cam_infos.append(CameraInfo(uid=idx, R=R, T=T, FovY=FovY, FovX=FovX, image=image,
-                                image_path=None, image_name=None, width=image.shape[1], height=image.shape[2],
+                                image_path=None, image_name=None, width=image.shape[2], height=image.shape[1],
                                 time = time,time_id=None,view_id=None))
             
         else:
@@ -411,7 +411,7 @@ def readCamerasFromTransforms(path, transformsfile, white_background, extension=
                 #T = -matrix[:3, 3] 
                 #image_path = os.path.join(path, cam_name)
                 image_path = cam_name
-                mask_path = os.path.join(path, 'masks',file_path)
+                mask_path = os.path.join(path, 'masks','train',os.path.basename(file_path))
                 image_name = Path(cam_name).stem
                 image = Image.open(image_path)
                 im_data = np.array(image.convert("RGBA"))
@@ -442,12 +442,12 @@ def readCamerasFromTransforms(path, transformsfile, white_background, extension=
                 # image = PILtoTorch(image,(800,800))
                 image = PILtoTorch(image,None)
                 if fovx is not None:
-                    fovy = focal2fov(fov2focal(fovx, image.shape[1]), image.shape[2])
+                    fovy = focal2fov(fov2focal(fovx, image.shape[2]), image.shape[1])
                     FovY = fovy 
                     FovX = fovx
                     
                     cam_infos.append(CameraInfo(uid=idx, R=R, T=T, FovY=FovY, FovX=FovX, image=image,
-                                image_path=image_path, image_name=image_name, width=image.shape[1], height=image.shape[2],
+                                image_path=image_path, image_name=image_name, width=image.shape[2], height=image.shape[1],
                                 time = time,view_id=view_id,time_id=time_id,mask=mask,preds=preds,preds_visibility=preds_visibility))
                     
                 else:
@@ -577,22 +577,35 @@ def readNerfSyntheticInfo(path, white_background, eval, extension=".png", time_s
         test_cam_infos = []
 
     nerf_normalization = getNerfppNorm(train_cam_infos)
-
+    scene_size = 2.0
     ply_path = os.path.join(path, "points3d.ply")
     # Since this data set has no colmap data, we start with random points
-    num_pts = 2000
-    print(f"Generating random point cloud ({num_pts})...")
-    
-    # We create random points inside the bounds of the synthetic Blender scenes
-    scene_size = 2.0
-    xyz = np.random.random((num_pts, 3)) * scene_size - scene_size / 2
-    shs = np.random.random((num_pts, 3)) / 255.0
-    pcd = BasicPointCloud(points=xyz, colors=SH2RGB(shs), normals=np.zeros((num_pts, 3)))
-    storePly(ply_path, xyz, SH2RGB(shs) * 255)
+    if not os.path.exists(ply_path):
+        num_pts = 1000
+        print(f"Generating random point cloud ({num_pts})...")
+
+        # We create random points inside the bounds of the synthetic Blender scenes
+        
+        xyz = np.random.random((num_pts, 3)) * scene_size - scene_size / 2
+        shs = np.random.random((num_pts, 3)) / 255.0
+        colors = SH2RGB(shs) * 255        
+        
+    else:
+        # Scale the initial pointcloud
+        pcd = fetchPly(ply_path)
+        xyz = np.array(scene_size * (pcd.points - (pcd.points.min())) / (pcd.points.max() - pcd.points.min()) - scene_size/2,dtype=np.float64)
+        shs = np.random.random((xyz.shape[0], 3)) / 255.0
+        colors = SH2RGB(shs) * 255      
+
+    storePly(ply_path, xyz, colors)
     try:
         pcd = fetchPly(ply_path)
     except:
         pcd = None
+        
+
+    
+    
 
     scene_info = SceneInfo(point_cloud=pcd,
                            train_cameras=train_cam_infos,
