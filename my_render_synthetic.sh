@@ -1,0 +1,13 @@
+CUDA_VISIBLE_DEVICES=1 python render_experimental.py \
+--iteration 30000 \
+--model_path "output/synthetic/scene_3_whole_skip_5_masks" \
+--configs "arguments/mdnerf-dataset/cube.py" \
+--skip_test \
+--skip_video \
+--time_skip 1 \
+--view_skip 10 \
+--scale 0.5 \
+--show_flow \
+--flow_skip 10 \
+--tracking_window 60 \
+--log_deform
