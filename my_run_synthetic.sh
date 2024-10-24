@@ -1,14 +1,14 @@
 CUDA_VISIBLE_DEVICES=1 python train.py \
--s "/scratch-ssd/Datasets/deformgs/synthetic/scene_3_whole/" \
+-s "/scratch-ssd/Datasets/deformgs/synthetic/scene_3/" \
 --port 6058 \
---expname "synthetic/scene_3_whole_skip_5_masks" \
+--expname "synthetic/scene_3_whole_skip_25_masks" \
 --configs "arguments/mdnerf-dataset/cube.py" \
 --lambda_w 2000 \
 --lambda_rigidity 0.0 \
 --lambda_spring 0.0 \
 --lambda_momentum 0.03 \
 --lambda_velocity 0.0 \
---view_skip 5 \
+--view_skip 25 \
 --time_skip 1 \
 --k_nearest 20 \
 --lambda_isometric 0.3 \
@@ -16,4 +16,4 @@ CUDA_VISIBLE_DEVICES=1 python train.py \
 --staticfying_from 10000 \
 --use_wandb \
 --wandb_project "synthetic_scene_3" \
---wandb_name "synthetic_full_skip5_masks"
+--wandb_name "synthetic_full_skip_25_masks"

@@ -1,13 +1,12 @@
 CUDA_VISIBLE_DEVICES=1 python render_experimental.py \
 --iteration 30000 \
---model_path "output/synthetic/scene_3_whole_skip_5_masks" \
---configs "arguments/mdnerf-dataset/cube.py" \
+--model_path "/scratch-ssd/Repos/deformgs/output/hemisphere_ts10_bigkplanes" \
+--configs "arguments/mdnerf-dataset/hemisphere.py" \
 --skip_test \
 --skip_video \
---time_skip 1 \
---view_skip 10 \
+--time_skip 6 \
+--view_skip 2 \
 --scale 0.5 \
 --show_flow \
 --flow_skip 40 \
 --tracking_window 60 \
---log_deform \
