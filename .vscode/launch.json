@@ -11,11 +11,12 @@
             "program": "./train.py",
             "justMyCode": false,
             "console": "integratedTerminal",
+            "env": { "name":"CUDA_VISIBLE_DEVICES", "value":"1"},
             "args": [
                 "-s","/scratch-ssd/Datasets/deformation/nerf/",
                 "--port","6059",
-                "--expname","deforming_hemisphere",
-                "--configs","arguments/mdnerf-dataset/cube.py",
+                "--expname","hemisphere_debug",
+                "--configs","arguments/mdnerf-dataset/hemisphere.py",
                 "--lambda_w","2000",
                 "--lambda_rigidity","0.0",
                 "--lambda_spring", "0.0",
@@ -42,25 +43,24 @@
             "program": "./train.py",
             "justMyCode": false,
             "console": "integratedTerminal",
+            "env": { "name":"CUDA_VISIBLE_DEVICES", "value":"0"},
             "args": [
-                "-s","/scratch-ssd/Datasets/deformgs/synthetic/scene_3",
+                "-s","/scratch-ssd/Datasets/deformgs/synthetic/scene_3/",
                 "--port","6058",
-                "--expname","synthetic/scene_3_masks",
+                "--expname","synthetic/garbage",
                 "--configs","arguments/mdnerf-dataset/cube.py",
                 "--lambda_w","2000",
                 "--lambda_rigidity","0.0",
                 "--lambda_spring", "0.0",
                 "--lambda_momentum", "0.03",
                 "--lambda_velocity", "0.0",
-                "--view_skip", "1",
+                "--view_skip", "20",
                 "--time_skip","1",
                 "--k_nearest", "20",
                 "--lambda_isometric", "0.3",
                 "--reg_iter", "11000",
                 "--staticfying_from", "10000",
-                "--use_wandb",
-                "--wandb_project", "synthetic_scene_3",
-                "--wandb_name", "init"
+                "--no_coarse"
 
             ]
         },
@@ -71,20 +71,55 @@
             "program": "./render_experimental.py",
             "justMyCode": false,
             "console": "integratedTerminal",
+            "env": { "name":"CUDA_VISIBLE_DEVICES", "value":"1"},
             "args": [
-                "--iteration","9000",
-                "--model_path","${workspaceFolder}/output/synthetic/scene_3_masks",
+                "--iteration","30000",
+                "--model_path","${workspaceFolder}/output/synthetic/scene_3_whole_skip_5_masks",
                 "--configs","arguments/mdnerf-dataset/cube.py",
-                "--single_cam_video",
-                "--skip_train",
+                "--skip_test",
+                "--skip_video",
                 "--time_skip","1",
-                "--view_skip", "5",
+                "--view_skip", "10",
                 "--scale", "0.5",
                 "--show_flow",
                 "--flow_skip", "40",
                 "--tracking_window", "60",
                 "--log_deform",
             ]
+        },
+        {
+            "name": "render deforming scene",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "./render_experimental.py",
+            "justMyCode": false,
+            "console": "integratedTerminal",
+            "args": [
+                "--iteration","20000",
+                "--model_path","${workspaceFolder}/output/deforming_hemisphere_ts7_fix",
+                "--configs","arguments/mdnerf-dataset/hemisphere.py",
+                "--skip_test",
+                "--skip_train",
+                "--time_skip","7",
+                "--view_skip", "1",
+                "--scale", "0.5",
+                "--show_flow",
+                "--flow_skip", "40",
+                "--tracking_window", "60",
+            ]
+        },
+        {
+            "name": "npz to ply",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "./npz2ply.py",
+            "justMyCode": false,
+            "console": "integratedTerminal",
+            "args": [
+                "--input","/scratch-ssd/Repos/deformgs/output/synthetic/scene_3_whole_skip_5_masks/train/ours_30000/log_deform_0.358974358974359.npz",
+                "--output","./here.ply",
+
         }
+
     ]
 }

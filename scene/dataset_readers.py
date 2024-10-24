@@ -588,16 +588,12 @@ def readNerfSyntheticInfo(path, white_background, eval, extension=".png", time_s
         
         xyz = np.random.random((num_pts, 3)) * scene_size - scene_size / 2
         shs = np.random.random((num_pts, 3)) / 255.0
-        colors = SH2RGB(shs) * 255        
+        colors = SH2RGB(shs) * 255 
+        storePly(ply_path, xyz, colors)       
         
-    else:
-        # Scale the initial pointcloud
-        pcd = fetchPly(ply_path)
-        xyz = np.array(scene_size * (pcd.points - (pcd.points.min())) / (pcd.points.max() - pcd.points.min()) - scene_size/2,dtype=np.float64)
-        shs = np.random.random((xyz.shape[0], 3)) / 255.0
-        colors = SH2RGB(shs) * 255      
+         
 
-    storePly(ply_path, xyz, colors)
+    
     try:
         pcd = fetchPly(ply_path)
     except:
