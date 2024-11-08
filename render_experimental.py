@@ -296,28 +296,29 @@ def render_set(model_path, name, iteration, views, gaussians, pipeline, backgrou
             gt = view.original_image[0:3, :, :]
             # torchvision.utils.save_image(gt, os.path.join(gts_path, '{0:05d}'.format(idx) + ".png"))
             gt_list.append(gt)
-    video_imgs = [to8(img) for img in render_list]
-    save_imgs = [torch.tensor((img.transpose(2,0,1)),device="cpu") for img in render_list ]
+    # video_imgs = [to8(img) for img in render_list]
+    # save_imgs = [torch.tensor((img.transpose(2,0,1)),device="cpu") for img in render_list ]
 
-    masks_video = [to8(img) for img in masks]
+    # masks_video = [to8(img) for img in masks]
 
-    time2=time()
-    print("FPS:",(len(views)-1)/(time2-time1))
-    count = 0
-    print("writing training images.")
-    if len(gt_list) != 0:
-        for image in tqdm(gt_list):
-            torchvision.utils.save_image(image, os.path.join(gts_path, '{0:05d}'.format(count) + ".png"))
-            count+=1
-    count = 0
-    print("writing rendering images.")
-    if len(save_imgs) != 0:
-        for image in tqdm(save_imgs):
-            torchvision.utils.save_image(image, os.path.join(render_path, '{0:05d}'.format(count) + ".png"))
-            count +=1
+    # time2=time()
+    # print("FPS:",(len(views)-1)/(time2-time1))
+    # count = 0
+    # print("writing training images.")
+    # if len(gt_list) != 0:
+    #     for image in tqdm(gt_list):
+    #         torchvision.utils.save_image(image, os.path.join(gts_path, '{0:05d}'.format(count) + ".png"))
+    #         count+=1
+    # count = 0
+    # print("writing rendering images.")
+    # if len(save_imgs) != 0:
+    #     for image in tqdm(save_imgs):
+    #         torchvision.utils.save_image(image, os.path.join(render_path, '{0:05d}'.format(count) + ".png"))
+    #         count +=1
 
-    imageio.mimwrite(os.path.join(model_path, name, "ours_{}".format(iteration), 'video_rgb.mp4'), video_imgs, fps=30, quality=8)
-    imageio.mimwrite(os.path.join(model_path, name, "ours_{}".format(iteration), 'video_masks.mp4'), masks_video, fps=30, quality=8)
+    np.save(os.path.join(model_path, name, "ours_{}".format(iteration), 'all_trajs.npy'),all_trajs)
+    # imageio.mimwrite(os.path.join(model_path, name, "ours_{}".format(iteration), 'video_rgb.mp4'), video_imgs, fps=30, quality=8)
+    # imageio.mimwrite(os.path.join(model_path, name, "ours_{}".format(iteration), 'video_masks.mp4'), masks_video, fps=30, quality=8)
 
 
 def signal_to_colors(signal,mode='minmax',threshold=None):
@@ -438,6 +439,8 @@ if __name__ == "__main__":
     parser.add_argument("--configs", type=str)
     parser.add_argument("--time_skip",type=int,default=None)
     parser.add_argument("--view_skip",default=None,type=int)
+    parser.add_argument("--view_ids",type=int,nargs='+',default=None)
+
     parser.add_argument("--log_deform", action="store_true")
     parser.add_argument("--three_steps_batch",type=bool,default=False)
     parser.add_argument("--show_flow",action="store_true")

@@ -669,6 +669,7 @@ if __name__ == "__main__":
     
     parser.add_argument("--view_skip",default=1,type=int)
     parser.add_argument("--time_skip",type=int,default=1)
+    parser.add_argument("--view_ids",type=int,nargs='+',default=None)
     ###  model parameters
     # disable shadow net
     parser.add_argument("--no_shadow",action="store_true")

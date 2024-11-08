@@ -45,9 +45,11 @@ class Scene:
         
         time_skip = None
         view_skip = None
+        view_ids = None
         if user_args is not None:
             time_skip = user_args.time_skip
             view_skip = user_args.view_skip
+            view_ids = user_args.view_ids
 
         if os.path.exists(os.path.join(args.source_path, "sparse")):
             scene_info = sceneLoadTypeCallbacks["Colmap"](args.source_path, args.images, args.eval)
@@ -59,7 +61,7 @@ class Scene:
             # print all keys of json
             if 'camera_angle_x' in data.keys() or 'fl_x' in data.keys():
                 print("Found transforms_train.json file with global intrinsics, assuming Blender data set!")
-                scene_info = sceneLoadTypeCallbacks["Blender"](args.source_path, args.white_background, args.eval,time_skip=time_skip,view_skip=view_skip)            
+                scene_info = sceneLoadTypeCallbacks["Blender"](args.source_path, args.white_background, args.eval,time_skip=time_skip,view_skip=view_skip,view_ids=view_ids)            
             else:
                 print("Found transforms_train.json file without global intrinsics, assuming Panopto data set!")
                 scene_info = sceneLoadTypeCallbacks["Panopto"](args.source_path, args.white_background, args.eval,time_skip=time_skip,view_skip=view_skip,scale=user_args.scale)
