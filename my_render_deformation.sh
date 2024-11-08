@@ -1,12 +1,11 @@
 CUDA_VISIBLE_DEVICES=1 python render_experimental.py \
 --iteration 30000 \
---model_path "/scratch-ssd/Repos/deformgs/output/hemisphere_ts10_bigkplanes" \
+--model_path "/scratch-ssd/Repos/deformgs/output/hemisphere/c3t2" \
 --configs "arguments/mdnerf-dataset/hemisphere.py" \
 --skip_test \
 --skip_video \
---time_skip 6 \
---view_skip 2 \
+--time_skip 1 \
+--view_ids 0 \
 --scale 0.5 \
---show_flow \
 --flow_skip 40 \
 --tracking_window 60 \
