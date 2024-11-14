@@ -6,6 +6,7 @@ from utils.graphics_utils import fov2focal, focal2fov
 import torch
 from utils.camera_utils import loadCam
 from utils.graphics_utils import focal2fov
+from PIL import Image
 
 class FourDGSdataset(Dataset):
     def __init__(
@@ -23,7 +24,8 @@ class FourDGSdataset(Dataset):
 
     def __getitem__(self, index):
         caminfo = self.dataset[self.idxs[index]]
-        image = caminfo.image
+        image = Image.open(caminfo.image_path)
+        image = PILtoTorch(image,None)
         R = caminfo.R
         T = caminfo.T
         FovX = caminfo.FovX
@@ -111,7 +113,8 @@ class MDNerfDataset(Dataset):
                 raise ValueError("No cam info found, this should not happen. Something is wrong in the provided data.")
         
         
-        image = caminfo.image
+        image = Image.open(caminfo.image_path)
+        image = PILtoTorch(image,None)
         mask = caminfo.mask
         R = caminfo.R
         T = caminfo.T

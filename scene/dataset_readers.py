@@ -37,7 +37,6 @@ class CameraInfo(NamedTuple):
     T: np.array
     FovY: np.array
     FovX: np.array
-    image: np.array
     image_path: str
     image_name: str
     width: int
@@ -126,9 +125,9 @@ def readColmapCameras(cam_extrinsics, cam_intrinsics, images_folder):
 
         image_path = os.path.join(images_folder, os.path.basename(extr.name))
         image_name = os.path.basename(image_path).split(".")[0]
-        image = Image.open(image_path)
-        image = PILtoTorch(image,None)
-        cam_info = CameraInfo(uid=uid, R=R, T=T, FovY=FovY, FovX=FovX, image=image,
+        # image = Image.open(image_path)
+        # image = PILtoTorch(image,None)
+        cam_info = CameraInfo(uid=uid, R=R, T=T, FovY=FovY, FovX=FovX,
                               image_path=image_path, image_name=image_name, width=width, height=height,
                               time = 0)
         cam_infos.append(cam_info)
@@ -143,8 +142,14 @@ def fetchPly(path,panopto=False):
         # flip z axis
     #    positions[:,2] = -positions[:,2]
     
-    colors = np.vstack([vertices['red'], vertices['green'], vertices['blue']]).T / 255.0
-    normals = np.vstack([vertices['nx'], vertices['ny'], vertices['nz']]).T
+    try:
+        colors = np.vstack([vertices['red'], vertices['green'], vertices['blue']]).T / 255.0
+    except:
+        colors = np.random.random((positions.shape[0],3))
+    try:
+        normals = np.vstack([vertices['nx'], vertices['ny'], vertices['nz']]).T
+    except:
+        normals = np.zeros_like(positions)
     return BasicPointCloud(points=positions, colors=colors, normals=normals)
 
 def storePly(path, xyz, rgb):
@@ -267,8 +272,6 @@ def generateCamerasFromTransforms(path, template_transformsfile, extension, maxt
         image_path = os.path.join(path, cam_name)
         image_name = Path(cam_name).stem
         image = Image.open(image_path)
-        im_data = np.array(image.convert("RGBA"))
-        # image = PILtoTorch(image,(800,800))
         image = PILtoTorch(image,None)
         break
     # format information
@@ -283,8 +286,8 @@ def generateCamerasFromTransforms(path, template_transformsfile, extension, maxt
             fovy = focal2fov(fov2focal(fovx, image.shape[1]), image.shape[2])
             FovY = fovy 
             FovX = fovx
-            cam_infos.append(CameraInfo(uid=idx, R=R, T=T, FovY=FovY, FovX=FovX, image=image,
-                                image_path=None, image_name=None, width=image.shape[2], height=image.shape[1],
+            cam_infos.append(CameraInfo(uid=idx, R=R, T=T, FovY=FovY, FovX=FovX,
+                                image_path=image_path, image_name=image_name, width=image.shape[2], height=image.shape[1],
                                 time = time,time_id=None,view_id=None))
             
         else:
@@ -301,7 +304,7 @@ def generateCamerasFromTransforms(path, template_transformsfile, extension, maxt
             
             fovx = None 
 
-            cam_infos.append(CameraInfo(uid=idx, R=R, T=T, FovY=FovY, FovX=FovX, image=image,
+            cam_infos.append(CameraInfo(uid=idx, R=R, T=T, FovY=FovY, FovX=FovX,
                             image_path=image_path, image_name=image_name, width=w, height=h,
                             time = time,view_id=None,time_id=None,flow=None,c_x=c_x,c_y=c_y,f_x=f_x,f_y=f_y))
 
@@ -449,7 +452,7 @@ def readCamerasFromTransforms(path, transformsfile, white_background, extension=
                     FovY = fovy 
                     FovX = fovx
                     
-                    cam_infos.append(CameraInfo(uid=idx, R=R, T=T, FovY=FovY, FovX=FovX, image=image,
+                    cam_infos.append(CameraInfo(uid=idx, R=R, T=T, FovY=FovY, FovX=FovX,
                                 image_path=image_path, image_name=image_name, width=image.shape[2], height=image.shape[1],
                                 time = time,view_id=view_id,time_id=time_id,mask=mask,preds=preds,preds_visibility=preds_visibility))
                     
@@ -475,7 +478,7 @@ def readCamerasFromTransforms(path, transformsfile, white_background, extension=
                     
                     fovx = None 
 
-                    cam_infos.append(CameraInfo(uid=idx, R=R, T=T, FovY=FovY, FovX=FovX, image=image,
+                    cam_infos.append(CameraInfo(uid=idx, R=R, T=T, FovY=FovY, FovX=FovX,
                                     image_path=image_path, image_name=image_name, width=w, height=h,
                                     time = time,view_id=view_id,time_id=time_id,preds=preds,preds_visibility=preds_visibility,c_x=c_x,c_y=c_y,f_x=f_x,f_y=f_y
                                     ,mask=mask))
@@ -559,8 +562,8 @@ def readNerfSyntheticInfo(path, white_background, eval, extension=".png", time_s
     print("Reading Training Transforms")
     train_cam_infos = readCamerasFromTransforms(path, "transforms_train.json", white_background, extension, timestamp_mapper, time_skip=time_skip,view_skip=view_skip,split='train',view_ids=view_ids)
     print("Reading Test Transforms")
-    # test_cam_infos = readCamerasFromTransforms(path, "transforms_test.json", white_background, extension, timestamp_mapper, time_skip=time_skip,view_skip=view_skip,split='test',view_ids=view_ids)
-    test_cam_infos = train_cam_infos
+    test_cam_infos = readCamerasFromTransforms(path, "transforms_test.json", white_background, extension, timestamp_mapper, time_skip=time_skip,view_skip=view_skip,split='test',view_ids=view_ids)
+    # test_cam_infos = train_cam_infos
     print("Generating Video Transforms")
 
     # computing all times used 
