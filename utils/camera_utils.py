@@ -28,7 +28,12 @@ def loadCam(args, id, cam_info, resolution_scale):
 
     # if resized_image_rgb.shape[1] == 4:
         # loaded_mask = resized_image_rgb[3:4, ...]
+    bg = np.array([1,1,1]) if args.white_background else np.array([0, 0, 0])
     image = Image.open(cam_info.image_path)
+    im_data = np.array(image.convert("RGBA"))
+    norm_data = im_data / 255.0
+    arr = norm_data[:,:,:3] * norm_data[:, :, 3:4] + bg * (1 - norm_data[:, :, 3:4])
+    image = Image.fromarray(np.array(arr*255.0, dtype=np.byte), "RGB")
     image = PILtoTorch(image,None)
     return Camera(colmap_id=cam_info.uid, R=cam_info.R, T=cam_info.T, 
                   FoVx=cam_info.FovX, FoVy=cam_info.FovY, 

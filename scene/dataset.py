@@ -24,7 +24,12 @@ class FourDGSdataset(Dataset):
 
     def __getitem__(self, index):
         caminfo = self.dataset[self.idxs[index]]
+        bg = np.array([1,1,1]) if self.args.white_background else np.array([0, 0, 0])
         image = Image.open(caminfo.image_path)
+        im_data = np.array(image.convert("RGBA"))
+        norm_data = im_data / 255.0
+        arr = norm_data[:,:,:3] * norm_data[:, :, 3:4] + bg * (1 - norm_data[:, :, 3:4])
+        image = Image.fromarray(np.array(arr*255.0, dtype=np.byte), "RGB")
         image = PILtoTorch(image,None)
         R = caminfo.R
         T = caminfo.T
@@ -112,8 +117,12 @@ class MDNerfDataset(Dataset):
             if caminfo is None:
                 raise ValueError("No cam info found, this should not happen. Something is wrong in the provided data.")
         
-        
+        bg = np.array([1,1,1]) if self.args.white_background else np.array([0, 0, 0])
         image = Image.open(caminfo.image_path)
+        im_data = np.array(image.convert("RGBA"))
+        norm_data = im_data / 255.0
+        arr = norm_data[:,:,:3] * norm_data[:, :, 3:4] + bg * (1 - norm_data[:, :, 3:4])
+        image = Image.fromarray(np.array(arr*255.0, dtype=np.byte), "RGB")
         image = PILtoTorch(image,None)
         mask = caminfo.mask
         R = caminfo.R
