@@ -126,6 +126,7 @@ def find_closest_gauss(gt,gauss):
     # return shape N x 1 
     gt = torch.tensor(gt,device='cuda',dtype=torch.float32)
     gauss = torch.tensor(gauss,device='cuda',dtype=torch.float32)
+    gauss = gauss[torch.randperm(gauss.shape[0])[:50000]]
     gt = gt.unsqueeze(0).repeat(gauss.shape[0],1,1)
     gauss = gauss.unsqueeze(1).repeat(1,gt.shape[1],1)
     dists = torch.norm(gt-gauss,dim=-1)
@@ -148,7 +149,7 @@ def render_set(model_path, name, iteration, views, gaussians, pipeline, backgrou
     n_gaussians = gaussians._xyz.shape[0]
     todo_times = np.unique(all_times)
     n_times = len(todo_times)
-    # colors = colormap[np.arange(n_gaussians) % len(colormap)]
+    colors = colormap[np.arange(n_gaussians) % len(colormap)]
     colors = sns.color_palette(n_colors=n_gaussians)
     prev_projections = None 
     current_projections = None 
@@ -166,7 +167,7 @@ def render_set(model_path, name, iteration, views, gaussians, pipeline, backgrou
     arrow_tickness = 2
     raddii_threshold = 0
     opacity_threshold = -10e10 # disabling this effectively
-    #opacity_threshold = 0.005
+    opacity_threshold = 0.005
     depth_dist_threshold = 1.0
     
     opacities = None
@@ -186,10 +187,10 @@ def render_set(model_path, name, iteration, views, gaussians, pipeline, backgrou
             # remove time from todo_times
             todo_times = todo_times[todo_times != view_time]
         
-        #view.image_height = int(view.image_height * args.scale)
-        #view.image_width = int(view.image_width * args.scale)
-        #view.image_height = int(view.image_height * args.scale)
-        #view.image_width = int(view.image_width * args.scale)
+        view.image_height = int(view.image_height * args.scale)
+        view.image_width = int(view.image_width * args.scale)
+        view.image_height = int(view.image_height * args.scale)
+        view.image_width = int(view.image_width * args.scale)
 
         render_pkg = render(view, gaussians, pipeline, background,log_deform_path=log_deform_path,no_shadow=args.no_shadow,override_color=force_colors,bounding_box=args.bounding_box)
         rendering = tonumpy(render_pkg["render"]).transpose(1,2,0)
@@ -296,14 +297,14 @@ def render_set(model_path, name, iteration, views, gaussians, pipeline, backgrou
             gt = view.original_image[0:3, :, :]
             # torchvision.utils.save_image(gt, os.path.join(gts_path, '{0:05d}'.format(idx) + ".png"))
             gt_list.append(gt)
-    # video_imgs = [to8(img) for img in render_list]
-    # save_imgs = [torch.tensor((img.transpose(2,0,1)),device="cpu") for img in render_list ]
+    video_imgs = [to8(img) for img in render_list]
+    save_imgs = [torch.tensor((img.transpose(2,0,1)),device="cpu") for img in render_list ]
 
-    # masks_video = [to8(img) for img in masks]
+    masks_video = [to8(img) for img in masks]
 
-    # time2=time()
-    # print("FPS:",(len(views)-1)/(time2-time1))
-    # count = 0
+    time2=time()
+    print("FPS:",(len(views)-1)/(time2-time1))
+    count = 0
     # print("writing training images.")
     # if len(gt_list) != 0:
     #     for image in tqdm(gt_list):
@@ -317,8 +318,8 @@ def render_set(model_path, name, iteration, views, gaussians, pipeline, backgrou
     #         count +=1
 
     np.save(os.path.join(model_path, name, "ours_{}".format(iteration), 'all_trajs.npy'),all_trajs)
-    # imageio.mimwrite(os.path.join(model_path, name, "ours_{}".format(iteration), 'video_rgb.mp4'), video_imgs, fps=30, quality=8)
-    # imageio.mimwrite(os.path.join(model_path, name, "ours_{}".format(iteration), 'video_masks.mp4'), masks_video, fps=30, quality=8)
+    imageio.mimwrite(os.path.join(model_path, name, "ours_{}".format(iteration), 'video_rgb.mp4'), video_imgs, fps=30, quality=8)
+    imageio.mimwrite(os.path.join(model_path, name, "ours_{}".format(iteration), 'video_masks.mp4'), masks_video, fps=30, quality=8)
 
 
 def signal_to_colors(signal,mode='minmax',threshold=None):
