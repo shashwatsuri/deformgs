@@ -135,6 +135,21 @@ def render(viewpoint_camera, pc : GaussianModel, pipe, bg_color : torch.Tensor, 
         debug=False
     )
 
+    mask_raster_settings = GaussianRasterizationSettings(
+        image_height=int(viewpoint_camera.image_height),
+        image_width=int(viewpoint_camera.image_width),
+        tanfovx=tanfovx,
+        tanfovy=tanfovy,
+        bg=bg_color*0.0,
+        scale_modifier=scaling_modifier,
+        viewmatrix=viewpoint_camera.world_view_transform.cuda(),
+        projmatrix=viewpoint_camera.full_proj_transform.cuda(),
+        sh_degree=pc.active_sh_degree,
+        campos=viewpoint_camera.camera_center.cuda(),
+        prefiltered=False,
+        debug=False
+    )
+
     # filename = viewpoint_camera.image_path.split('/')[-1].split('.')[0]
     # #write all inputs to GaussianRasterizationSettings to a txt file
     # with open('4dgs_inputs/{}.txt'.format(filename), 'w') as f:
@@ -142,6 +157,7 @@ def render(viewpoint_camera, pc : GaussianModel, pipe, bg_color : torch.Tensor, 
 
 
     rasterizer = GaussianRasterizer(raster_settings=raster_settings)
+    mask_rasterizer = GaussianRasterizer(raster_settings=mask_raster_settings)
 
     # means3D = pc.get_xyz
     # add deformation to each points
@@ -278,7 +294,7 @@ def render(viewpoint_camera, pc : GaussianModel, pipe, bg_color : torch.Tensor, 
         cov3D_precomp = cov3D_precomp)
     
 
-    rendered_mask, _, _ = rasterizer(
+    rendered_mask, _, _ = mask_rasterizer(
         means3D = means3D_final[mask],
         means2D = means2D[mask],
         shs = shs,
