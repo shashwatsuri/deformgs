@@ -1,7 +1,7 @@
-CUDA_VISIBLE_DEVICES=0 python train.py \
+CUDA_VISIBLE_DEVICES=1 python train.py \
   -s "/scratch-ssd/Datasets/deformation/nerf/" \
   --port 6059 \
-  --expname "hemisphere/c3t1" \
+  --expname "hemisphere/c3t1_masks_flip" \
   --configs "arguments/mdnerf-dataset/hemisphere.py" \
   --lambda_w 2000 \
   --lambda_rigidity 0.0 \
