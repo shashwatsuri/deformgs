@@ -77,7 +77,7 @@ def find_closest_gauss(gt,gauss):
     # return shape N x 1 
     gt = torch.tensor(gt,device='cuda',dtype=torch.float32)
     gauss = torch.tensor(gauss,device='cuda',dtype=torch.float32)
-    gauss = gauss[torch.randperm(gauss.shape[0])[:50000]]
+    # gauss = gauss[torch.randperm(gauss.shape[0])[:50000]]
     gt = gt.unsqueeze(0).repeat(gauss.shape[0],1,1)
     gauss = gauss.unsqueeze(1).repeat(1,gt.shape[1],1)
     dists = torch.norm(gt-gauss,dim=-1)

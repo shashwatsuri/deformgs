@@ -1,7 +1,7 @@
 CUDA_VISIBLE_DEVICES=1 python train.py \
-  -s "/scratch-ssd/Datasets/deformation/nerf/" \
+  -s "/scratch-ssd/Datasets/deformation/nerf_black/" \
   --port 6059 \
-  --expname "hemisphere/c3t1_masks_flip" \
+  --expname "hemisphere/c3t1_ballmasks_sampled_black" \
   --configs "arguments/mdnerf-dataset/hemisphere.py" \
   --lambda_w 2000 \
   --lambda_rigidity 0.0 \
@@ -17,4 +17,3 @@ CUDA_VISIBLE_DEVICES=1 python train.py \
   --use_wandb \
   --wandb_project "deforming_hemisphere" \
   --wandb_name "deforming_hemisphere" \
-  --white_background

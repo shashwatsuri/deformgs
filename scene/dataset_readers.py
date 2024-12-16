@@ -561,8 +561,8 @@ def readNerfSyntheticInfo(path, white_background, eval, extension=".png", time_s
     print("Reading Training Transforms")
     train_cam_infos = readCamerasFromTransforms(path, "transforms_train.json", white_background, extension, timestamp_mapper, time_skip=time_skip,view_skip=view_skip,split='train',view_ids=view_ids)
     print("Reading Test Transforms")
-    test_cam_infos = readCamerasFromTransforms(path, "transforms_test.json", white_background, extension, timestamp_mapper, time_skip=time_skip,view_skip=view_skip,split='test',view_ids=view_ids)
-    # test_cam_infos = train_cam_infos
+    #test_cam_infos = readCamerasFromTransforms(path, "transforms_test.json", white_background, extension, timestamp_mapper, time_skip=time_skip,view_skip=view_skip,split='test',view_ids=view_ids)
+    test_cam_infos = train_cam_infos
     print("Generating Video Transforms")
 
     # computing all times used 
@@ -584,18 +584,21 @@ def readNerfSyntheticInfo(path, white_background, eval, extension=".png", time_s
 
     nerf_normalization = getNerfppNorm(train_cam_infos)
     scene_size = 2.0
-    ply_path = os.path.join(path, "points3d.ply")
+    ply_path = os.path.join(path, "sampled_points3d.ply")
     # Since this data set has no colmap data, we start with random points
     if not os.path.exists(ply_path):
+        
         num_pts = 1000
         print(f"Generating random point cloud ({num_pts})...")
-
+        breakpoint()
         # We create random points inside the bounds of the synthetic Blender scenes
         
         xyz = np.random.random((num_pts, 3)) * scene_size - scene_size / 2
         shs = np.random.random((num_pts, 3)) / 255.0
         colors = SH2RGB(shs) * 255 
-        storePly(ply_path, xyz, colors)       
+        storePly(ply_path, xyz, colors)  
+    
+
         
          
 
