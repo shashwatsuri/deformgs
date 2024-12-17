@@ -90,7 +90,7 @@ class ModelHiddenParams(ParamGroup):
                             }
         self.multires = [1, 2, 4, 8]
         self.no_grid=False
-        self.no_ds=False
+        self.no_ds=True
         self.no_dr=False
         self.no_do=True
 

@@ -1,7 +1,7 @@
 CUDA_VISIBLE_DEVICES=1 python train.py \
   -s "/scratch-ssd/Datasets/deformation/nerf_black/" \
   --port 6059 \
-  --expname "hemisphere/c3t1_ballmasks_sampled_black" \
+  --expname "hemisphere/c3t1_ballmasks_sampled_black_no_ds" \
   --configs "arguments/mdnerf-dataset/hemisphere.py" \
   --lambda_w 2000 \
   --lambda_rigidity 0.0 \
